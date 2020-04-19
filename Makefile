@@ -1,4 +1,3 @@
-APP_NAME = # Set to something bespoke if needed
 GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 DOCKER_BUILD=$(shell pwd)/.docker_build
 DOCKER_CMD=$(DOCKER_BUILD)/server
@@ -12,13 +11,21 @@ clean:
 
 # ================ HEROKU ================
 
-heroku-create:
-	heroku create $(APP_NAME) --region eu --no-remote
+heroku-create: # Creates a new app with a random name on Heroku
+	heroku create --region eu --no-remote
 
-heroku-push: $(DOCKER_CMD)
+heroku-login:
+	heroku container:login
+
+heroku-push: heroku-login $(DOCKER_CMD) # Pushes the current local image to heroku for deployment
 	heroku container:push web
 
-heroku-destroy:
+heroku-release: # Releases the current image on heroku to production
+	heroku container:release web
+
+heroku-deploy: $(DOCKER_CMD) heroku-login heroku-push heroku-release # Builds, pushes and releases to production
+
+heroku-destroy: # Deletes the current app from Heroku. Requires confirmation.
 	heroku destroy
 
 # ================ DOCKER COMPOSE ================
