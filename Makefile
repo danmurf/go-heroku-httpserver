@@ -1,6 +1,12 @@
+#!make
+include .env
+export $(shell sed 's/=.*//' .env)
+
 GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 DOCKER_BUILD=$(shell pwd)/.docker_build
 DOCKER_CMD=$(DOCKER_BUILD)/server
+LOCAL_BUILD=$(shell pwd)/bin
+LOCAL_CMD=$(LOCAL_BUILD)/server
 
 $(DOCKER_CMD): clean
 	mkdir -p $(DOCKER_BUILD)
@@ -40,3 +46,19 @@ docker-logs:
 
 docker-down:
 	docker-compose down --volumes
+
+# ================ LOCAL ================
+
+local-build: lint test
+	go build -o ${LOCAL_CMD} cmd/server/server.go
+
+local-run: local-build
+	$(LOCAL_CMD)
+
+# ================ QUALITY TOOLS ================
+
+lint:
+	go fmt github.com/danmurf...
+
+test:
+	go test ./...
