@@ -1,0 +1,12 @@
+{
+    "name": "Go Heroku HTTP Server",
+    "description": "Go Getting Started Example App",
+    "keywords": [
+        "go",
+        "heroku",
+        "http",
+        "server"
+    ],
+    "website": "http://github.com/danmurf/go-heroku-httpserver",
+    "repository": "http://github.com/danmurf/go-heroku-httpserver"
+}

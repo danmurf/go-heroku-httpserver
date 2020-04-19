@@ -1,15 +1,13 @@
-.DEFAULT_GOAL := build
-COMMAND_BUILD_FILE := server/server.go
-COMMAND_NAME := server
+GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+DOCKER_BUILD=$(shell pwd)/.docker_build
+DOCKER_CMD=$(DOCKER_BUILD)/server
 
-build: lint test
-	go build -o bin/${COMMAND_NAME} cmd/${COMMAND_BUILD_FILE}
+$(DOCKER_CMD): clean
+	mkdir -p $(DOCKER_BUILD)
+	$(GO_BUILD_ENV) go build -v -o $(DOCKER_CMD) cmd/server/server.go
 
-lint:
-	go fmt github.com/danmurf...
+clean:
+	rm -rf $(DOCKER_BUILD)
 
-test:
-	go test ./...
-
-run: build
-	bin/${COMMAND_NAME}
+heroku: $(DOCKER_CMD)
+	heroku container:push web
